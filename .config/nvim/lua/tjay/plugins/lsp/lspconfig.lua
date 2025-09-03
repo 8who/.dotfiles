@@ -1,211 +1,3 @@
--- return {
---     "neovim/nvim-lspconfig",
---     event = { "BufReadPre", "BufNewFile" },
---     dependencies = {
---         "hrsh7th/cmp-nvim-lsp",
---         "williamboman/mason-lspconfig.nvim",
---         { "antosha417/nvim-lsp-file-operations", config = true },
---         { "folke/neodev.nvim", opts = {} },
---     },
---     config = function()
---         -- import lspconfig plugin
---         local lspconfig = require("lspconfig")
---
---         -- import mason_lspconfig plugin
---         local mason_lspconfig = require("mason-lspconfig")
---
---         -- import cmp-nvim-lsp plugin
---         local cmp_nvim_lsp = require("cmp_nvim_lsp")
---
---         local keymap = vim.keymap -- for conciseness
---
---         vim.diagnostic.config({
---             virtual_text = true, -- Disable inline messages
---             signs = true, -- Show icons in the sign column
---             underline = true, -- Underline problematic code
---             update_in_insert = false, -- Don't update diagnostics while typing
---             severity_sort = true, -- Sort diagnostics by severity
---         })
---
---         vim.api.nvim_create_autocmd("LspAttach", {
---             group = vim.api.nvim_create_augroup("UserLspConfig", {}),
---             callback = function(ev)
---                 -- Buffer local mappings.
---                 -- See `:help vim.lsp.*` for documentation on any of the below functions
---                 local opts = { buffer = ev.buf, silent = true }
---
---                 -- set keybinds
---                 opts.desc = "Show LSP references"
---                 keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
---
---                 opts.desc = "Go to declaration"
---                 keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- go to declaration
---
---                 opts.desc = "Show LSP definitions"
---                 keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- show lsp definitions
---
---                 opts.desc = "Show LSP implementations"
---                 keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
---
---                 opts.desc = "Show LSP type definitions"
---                 keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
---
---                 opts.desc = "See available code actions"
---                 keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
---
---                 opts.desc = "Smart rename"
---                 keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts) -- smart rename
---
---                 opts.desc = "Show buffer diagnostics"
---                 keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show  diagnostics for file
---
---                 opts.desc = "Show line diagnostics"
---                 keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
---
---                 opts.desc = "Go to previous diagnostic"
---                 keymap.set("n", "[d", vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
---
---                 opts.desc = "Go to next diagnostic"
---                 keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
---
---                 opts.desc = "Restart LSP"
---                 keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
---             end,
---         })
---
---         -- used to enable autocompletion (assign to every lsp server config)
---         local capabilities = cmp_nvim_lsp.default_capabilities()
---
---         -- Change the Diagnostic symbols in the sign column (gutter)
---         -- (not in youtube nvim video)
---         -- Change the Diagnostic symbols in the sign column (gutter)
---         vim.diagnostic.config({
---             virtual_text = true,
---             signs = {
---                 text = {
---                     [vim.diagnostic.severity.ERROR] = " ",
---                     [vim.diagnostic.severity.WARN] = " ",
---                     [vim.diagnostic.severity.HINT] = "󰠠 ",
---                     [vim.diagnostic.severity.INFO] = " ",
---                 },
---             },
---             underline = true,
---             update_in_insert = false,
---             severity_sort = true,
---         })
---
---         mason_lspconfig.setup_handlers({
---             -- default handler for installed servers
---             function(server_name)
---                 lspconfig[server_name].setup({
---                     capabilities = capabilities,
---                 })
---             end,
---             ["pyright"] = function()
---                 -- configure pyright language server for Python
---                 lspconfig["pyright"].setup({
---                     capabilities = capabilities,
---                     settings = {
---                         python = {
---                             analysis = {
---                                 autoSearchPaths = true,
---                                 diagnosticMode = "workspace", -- Analyze the entire workspace
---                                 useLibraryCodeForTypes = true,
---                                 typeCheckingMode = "off", -- Can also be "basic" or "strict"
---                             },
---                         },
---                     },
---                 })
---             end,
---             ["svelte"] = function()
---                 -- configure svelte server
---                 lspconfig["svelte"].setup({
---                     capabilities = capabilities,
---                     on_attach = function(client, bufnr)
---                         vim.api.nvim_create_autocmd("BufWritePost", {
---                             pattern = { "*.js", "*.ts" },
---                             callback = function(ctx)
---                                 -- Here use ctx.match instead of ctx.file
---                                 client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
---                             end,
---                         })
---                     end,
---                 })
---             end,
---             ["graphql"] = function()
---                 -- configure graphql language server
---                 lspconfig["graphql"].setup({
---                     capabilities = capabilities,
---                     filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
---                 })
---             end,
---             ["emmet_ls"] = function()
---                 -- configure emmet language server
---                 lspconfig["emmet_ls"].setup({
---                     capabilities = capabilities,
---                     filetypes = {
---                         "html",
---                         "typescriptreact",
---                         "javascriptreact",
---                         "css",
---                         "sass",
---                         "scss",
---                         "less",
---                         "svelte",
---                     },
---                 })
---             end,
---             ["lua_ls"] = function()
---                 -- configure lua server (with special settings)
---                 lspconfig["lua_ls"].setup({
---                     capabilities = capabilities,
---                     settings = {
---                         Lua = {
---                             -- make the language server recognize "vim" global
---                             diagnostics = {
---                                 globals = { "vim" },
---                             },
---                             completion = {
---                                 callSnippet = "Replace",
---                             },
---                         },
---                     },
---                 })
---             end,
---             ["gopls"] = function()
---                 -- Configure gopls for Go
---                 lspconfig["gopls"].setup({
---                     capabilities = capabilities,
---                     settings = {
---                         gopls = {
---                             analyses = {
---                                 unusedparams = true, -- Enable analysis for unused function parameters
---                             },
---                             staticcheck = true, -- Enable static analysis checks
---                         },
---                     },
---                 })
---             end,
---             ["clangd"] = function()
---                 -- configure clangd for C/C++
---                 lspconfig["clangd"].setup({
---                     capabilities = capabilities, -- Use your existing capabilities (e.g., for autocompletion)
---                     settings = {
---                         clangd = {
---                             -- Enable some helpful features for C/C++ (e.g., diagnostics, autocomplete)
---                             semanticHighlighting = true, -- Enable semantic highlighting
---                             diagnostics = {
---                                 enable = true, -- Enable diagnostics
---                             },
---                             -- Additional configuration specific to clangd can go here
---                         },
---                     },
---                 })
---             end,
---         })
---     end,
--- }
-
 return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
@@ -394,18 +186,22 @@ return {
         -- Auto-generate compile_commands.json for embedded projects
         vim.api.nvim_create_autocmd("BufWritePost", {
             pattern = { "Makefile", "*.mk", "CMakeLists.txt", "*.ioc" },
-            group = vim.api.nvim_create_augroup("EmbeddedCompileCommands", {}),
+            group = vim.api.nvim_create_augroup("EmbeddedCompileCommands", { clear = true }),
             callback = function()
                 local makefile_exists = vim.fn.filereadable("Makefile") == 1
                 local cmake_exists = vim.fn.filereadable("CMakeLists.txt") == 1
-                local compile_commands_exists = vim.fn.filereadable("compile_commands.json") == 1
 
-                if makefile_exists and not compile_commands_exists then
-                    vim.notify("Generating compile_commands.json with bear...", vim.log.levels.INFO)
+                if makefile_exists then
+                    vim.notify("Regenerating compile_commands.json with bear...", vim.log.levels.INFO)
                     vim.fn.system("bear -- make clean && bear -- make -j$(nproc)")
-                elseif cmake_exists and not compile_commands_exists then
-                    vim.notify("Generating compile_commands.json with cmake...", vim.log.levels.INFO)
-                    vim.fn.system("cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .")
+                elseif cmake_exists then
+                    vim.notify("Regenerating compile_commands.json with cmake...", vim.log.levels.INFO)
+                    vim.fn.system("cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON . && cmake --build .")
+                else
+                    vim.notify(
+                        "No Makefile or CMakeLists.txt found to regenerate compile_commands.json.",
+                        vim.log.levels.WARN
+                    )
                 end
             end,
         })
