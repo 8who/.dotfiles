@@ -190,18 +190,14 @@ return {
             callback = function()
                 local makefile_exists = vim.fn.filereadable("Makefile") == 1
                 local cmake_exists = vim.fn.filereadable("CMakeLists.txt") == 1
+                local compile_commands_exists = vim.fn.filereadable("compile_commands.json") == 1
 
-                if makefile_exists then
-                    vim.notify("Regenerating compile_commands.json with bear...", vim.log.levels.INFO)
-                    vim.fn.system("bear -- make clean && bear -- make -j$(nproc)")
-                elseif cmake_exists then
-                    vim.notify("Regenerating compile_commands.json with cmake...", vim.log.levels.INFO)
-                    vim.fn.system("cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON . && cmake --build .")
-                else
-                    vim.notify(
-                        "No Makefile or CMakeLists.txt found to regenerate compile_commands.json.",
-                        vim.log.levels.WARN
-                    )
+                if makefile_exists and not compile_commands_exists then
+                    vim.notify("Generating compile_commands.json with bear...", vim.log.levels.INFO)
+                    vim.fn.system("compiledb make clean && compiledb make -j$(nproc)")
+                elseif cmake_exists and not compile_commands_exists then
+                    vim.notify("Generating compile_commands.json with cmake...", vim.log.levels.INFO)
+                    vim.fn.system("cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .")
                 end
             end,
         })
