@@ -1,5 +1,7 @@
 require("tjay.core")
 require("tjay.lazy")
+vim.opt.modeline = false
+vim.opt.modelines = 0
 vim.opt.showmode = false
 vim.o.termguicolors = true -- Ensure true colors for WezTerm compatibility
 

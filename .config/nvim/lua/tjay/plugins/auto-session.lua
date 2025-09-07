@@ -1,5 +1,7 @@
 return {
     "rmagatti/auto-session",
+    -- "cameronr/auto-session",
+    -- branch = "fix/windows-fzf-terminal",
     config = function()
         local auto_session = require("auto-session")
 
@@ -46,13 +48,13 @@ return {
             desc = "Save session for auto session root dir",
         })
 
-        -- Additional useful keymaps (optional)
-        keymap.set("n", "<leader>wd", "<cmd>AutoSession delete<CR>", {
-            desc = "Delete session for current directory",
-        })
-
-        keymap.set("n", "<leader>wf", "<cmd>AutoSession search<CR>", {
-            desc = "Search sessions",
-        })
+        -- -- Additional useful keymaps (optional)
+        -- keymap.set("n", "<leader>wd", "<cmd>AutoSession delete<CR>", {
+        --     desc = "Delete session for current directory",
+        -- })
+        --
+        -- keymap.set("n", "<leader>wf", "<cmd>AutoSession search<CR>", {
+        --     desc = "Search sessions",
+        -- })
     end,
 }

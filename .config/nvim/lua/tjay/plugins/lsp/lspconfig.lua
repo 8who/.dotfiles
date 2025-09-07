@@ -139,6 +139,7 @@ return {
             clangd = {
                 cmd = {
                     "clangd",
+                    "--query-driver=/usr/local/arm-gnu-toolchain-14.3.rel1-darwin-arm64-arm-none-eabi/bin/arm-none-eabi-*",
                     "--background-index",
                     "--suggest-missing-includes",
                     "--clang-tidy",
@@ -151,7 +152,10 @@ return {
                     "--pretty",
                     "--all-scopes-completion",
                     "--header-insertion-decorators",
+                    "--compile-commands-dir=/Users/tjay/ProjectFolder/STM32F4G_LedOn-HAL",
+                    "--offset-encoding=utf-16",
                 },
+                filetypes = { "c", "cpp", "objc", "objcpp", "s" },
                 init_options = {
                     usePlaceholders = true,
                     completeUnimported = true,
